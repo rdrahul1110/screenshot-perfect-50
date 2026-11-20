@@ -25,6 +25,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { gaps, sync } from "@/data/mockData";
+import { useSnitchData } from "@/hooks/useSnitchData";
 const nav = [
   { to: "/", name: "Command Center", icon: LayoutDashboard },
   { to: "/gaps", name: "Gap Explorer", icon: ScanLine },
@@ -39,6 +40,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [newOpen, setNewOpen] = useState(false);
   const [hypothesis, setHypothesis] = useState("");
   const [saved, setSaved] = useState<string[]>([]);
+  const { isLive, refresh, endpoint } = useSnitchData();
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -56,9 +58,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           SNITCH<span className="brand-mark">®</span>
         </Link>
         <span className="product-label">Creative Command Center</span>
-        <div className="header-sync">
-          <span className="live-dot" />
-          <span>Ad Library Synced</span>
+        <div 
+          className="header-sync" 
+          title={`Data Source: ${isLive ? "Live Oracle n8n API" : "Verified Pipeline Snapshot"}\nEndpoint: ${endpoint}`}
+          onClick={() => {
+            refresh();
+            toast.info(isLive ? "Refreshed from live n8n webhook" : "Querying n8n webhook endpoint...");
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <span className="live-dot" style={{ backgroundColor: isLive ? "var(--success)" : undefined }} />
+          <span>{isLive ? "Live n8n Synced" : "Ad Library Synced"}</span>
           <span className="header-sync-count">{sync.ads} ads</span>
         </div>
         <div className="header-actions">
