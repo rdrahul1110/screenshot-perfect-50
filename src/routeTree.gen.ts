@@ -10,33 +10,63 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GapsRouteImport } from './routes/gaps'
+import { Route as StrengthsRouteImport } from './routes/strengths'
+import { Route as BriefsIdRouteImport } from './routes/briefs.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GapsRoute = GapsRouteImport.update({
+  id: '/gaps',
+  path: '/gaps',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StrengthsRoute = StrengthsRouteImport.update({
+  id: '/strengths',
+  path: '/strengths',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BriefsIdRoute = BriefsIdRouteImport.update({
+  id: '/briefs/$id',
+  path: '/briefs/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/gaps': typeof GapsRoute
+  '/strengths': typeof StrengthsRoute
+  '/briefs/$id': typeof BriefsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/gaps': typeof GapsRoute
+  '/strengths': typeof StrengthsRoute
+  '/briefs/$id': typeof BriefsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/gaps': typeof GapsRoute
+  '/strengths': typeof StrengthsRoute
+  '/briefs/$id': typeof BriefsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/gaps' | '/strengths' | '/briefs/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/gaps' | '/strengths' | '/briefs/$id'
+  id: '__root__' | '/' | '/gaps' | '/strengths' | '/briefs/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  GapsRoute: typeof GapsRoute
+  StrengthsRoute: typeof StrengthsRoute
+  BriefsIdRoute: typeof BriefsIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +78,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gaps': {
+      id: '/gaps'
+      path: '/gaps'
+      fullPath: '/gaps'
+      preLoaderRoute: typeof GapsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/strengths': {
+      id: '/strengths'
+      path: '/strengths'
+      fullPath: '/strengths'
+      preLoaderRoute: typeof StrengthsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/briefs/$id': {
+      id: '/briefs/$id'
+      path: '/briefs/$id'
+      fullPath: '/briefs/$id'
+      preLoaderRoute: typeof BriefsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  GapsRoute: GapsRoute,
+  StrengthsRoute: StrengthsRoute,
+  BriefsIdRoute: BriefsIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

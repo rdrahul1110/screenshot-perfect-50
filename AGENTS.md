@@ -28,3 +28,10 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+<!-- AGENT-MEMORY:BEGIN -->
+- Keep operational data and launch rules in the typed mock store; this frontend-only workspace must be swappable to a live data source without changing views.
+- Use shared feature views within TanStack leaf routes and a root workspace shell so navigation and metadata stay consistent.
+- Treat copy remixing and hypothesis creation as session-only mock interactions; never imply a live external service or actual campaign mutation.
+- Define semantic visual styles in the global design system and use existing design-system controls to preserve consistent presentation.
+<!-- AGENT-MEMORY:END -->
