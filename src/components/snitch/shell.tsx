@@ -29,7 +29,7 @@ import { useSnitchData } from "@/hooks/useSnitchData";
 const nav = [
   { to: "/", name: "Command Center", icon: LayoutDashboard },
   { to: "/gaps", name: "Gap Explorer", icon: ScanLine },
-  { to: "/briefs/$id", name: "Brief Inspector", icon: FileText },
+  { to: "/briefs/$id", name: "Action Plan", icon: FileText },
   { to: "/strengths", name: "Strength Defense", icon: ShieldCheck },
 ] as const;
 export function AppShell({ children }: { children: React.ReactNode }) {

@@ -6,12 +6,12 @@ export const Route = createFileRoute("/briefs/$id")({
     const name = gaps.find((g) => g.id === params.id)?.name ?? "Unavailable";
     return {
       meta: [
-        { title: `${name} — Production Brief · Snitch` },
+        { title: `${name} — Action Plan · Snitch` },
         {
           name: "description",
           content: `Storyboard, copy vault, and media buying launch specifications for ${name}.`,
         },
-        { property: "og:title", content: `${name} — Production Brief · Snitch` },
+        { property: "og:title", content: `${name} — Action Plan · Snitch` },
         {
           property: "og:description",
           content: `Turn ${name} into a production-ready creative and media buying plan.`,

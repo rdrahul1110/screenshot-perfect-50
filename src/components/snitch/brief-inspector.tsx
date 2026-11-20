@@ -71,12 +71,12 @@ export function BriefInspector({ id }: { id: string }) {
       </div>
       <PageHeading
         eyebrow="FROM INTELLIGENCE TO EXECUTION"
-        title="Brief Inspector"
-        description="One opportunity. A complete production and launch plan."
+        title="Action Plan"
+        description="One high-leverage opportunity. A complete production and media buying plan."
         action={
           <Chip tone="info">
             <CheckCircle2 size={12} />
-            Ready for production
+            Ready for execution
           </Chip>
         }
       />
@@ -92,7 +92,7 @@ export function BriefInspector({ id }: { id: string }) {
           </Chip>
         </div>
         <h2>
-          Brief #{id}: {title}
+          Action Plan #{id}: {title}
         </h2>
         <p>
           Competitors run this{" "}

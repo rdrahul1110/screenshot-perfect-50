@@ -317,36 +317,29 @@ export function CommandCenter() {
         <table className="gap-table">
           <thead>
             <tr>
-              <th>
+              <th style={{ width: "60px" }}>
                 <Button variant="ghost" className="sort-button" onClick={() => sortBy("priority")}>
                   Rank
                   <ArrowUpDown size={12} />
                 </Button>
               </th>
-              <th>Dimension</th>
-              <th>
-                <Button variant="ghost" className="sort-button" onClick={() => sortBy("name")}>
-                  Category / Opportunity
-                  <ArrowUpDown size={12} />
-                </Button>
-              </th>
-              <th>Strategic flag</th>
-              <th>Gap type</th>
-              <th>Snitch / Comp.</th>
+              <th>Opportunity & Dimension</th>
+              <th>Strategic Flag</th>
+              <th>Snitch vs Market Share</th>
               <th>
                 <Button variant="ghost" className="sort-button" onClick={() => sortBy("index")}>
-                  Gap index
+                  Gap Index
                   <ArrowUpDown size={12} />
                 </Button>
               </th>
               <th>
                 <Button variant="ghost" className="sort-button" onClick={() => sortBy("lift")}>
-                  30d lift
+                  30d Durability Lift
                   <ArrowUpDown size={12} />
                 </Button>
               </th>
               <th>Evidence</th>
-              <th>Action</th>
+              <th style={{ textAlign: "right" }}>Execution CTA</th>
             </tr>
           </thead>
           <tbody>
@@ -360,11 +353,21 @@ export function CommandCenter() {
                   if (e.key === "Enter") setSelected(g);
                 }}
               >
-                <td className="mono text-muted-foreground">{String(g.rank).padStart(2, "0")}</td>
-                <td>{g.dimension}</td>
+                <td>
+                  <span className={`rank-badge ${g.rank <= 3 ? "top-rank" : ""}`}>
+                    #{String(g.rank).padStart(2, "0")}
+                  </span>
+                </td>
                 <td className="name-cell">
-                  <strong>{g.name}</strong>
-                  <small>{g.category}</small>
+                  <div className="opportunity-cell-wrap">
+                    <span className="opportunity-title">
+                      {g.name}
+                      {g.rank === 1 && <Chip tone="warning">Top Gap</Chip>}
+                    </span>
+                    <span className="opportunity-meta">
+                      <span>{g.dimension}</span> · <code>{g.category}</code>
+                    </span>
+                  </div>
                 </td>
                 <td>
                   <Chip tone={g.index < 100 ? "danger" : g.type === "TRIM" ? "warning" : "success"}>
@@ -372,46 +375,61 @@ export function CommandCenter() {
                   </Chip>
                 </td>
                 <td>
-                  <Chip
-                    tone={
-                      g.type === "CATCH_UP" || g.type === "DEFEND"
-                        ? "success"
-                        : g.type === "TRIM"
-                          ? "danger"
-                          : "warning"
-                    }
-                  >
-                    {typeNames[g.type] || g.type}
-                  </Chip>
-                </td>
-                <td className="mono">
-                  <b>{g.snitch.toFixed(1)}%</b>
-                  <span className="text-muted-foreground"> / {g.competitor.toFixed(1)}%</span>
-                </td>
-                <td className="mono">
-                  {g.index}
-                  <div className="text-muted-foreground text-[8px] mt-1">
-                    CI {Math.round(g.index * 0.72)}–{Math.round(g.index * 1.28)}
+                  <div className="share-cell">
+                    <div className="share-numbers">
+                      <span className="snitch-share-val">{g.snitch.toFixed(1)}% Snitch</span>
+                      <span className="comp-share-val">{g.competitor.toFixed(1)}% Market</span>
+                    </div>
+                    <div className="mini-share-track">
+                      <span
+                        className="mini-snitch-bar"
+                        style={{ width: `${Math.min(100, Math.max(8, g.snitch))}%` }}
+                      />
+                      <span
+                        className="mini-comp-bar"
+                        style={{ width: `${Math.min(100, Math.max(8, g.competitor))}%` }}
+                      />
+                    </div>
                   </div>
                 </td>
-                <td className={`mono ${g.lift >= 1 ? "text-success" : "text-danger"}`}>
-                  {g.lift.toFixed(2)}×
+                <td>
+                  <span
+                    className={`index-pill ${g.index <= 10 ? "extreme-gap" : g.index <= 100 ? "moderate-gap" : "moat-gap"}`}
+                  >
+                    Index {g.index > 500 ? "500+" : g.index}
+                    {g.index <= 10 && ` · ${Math.round(g.competitor / Math.max(g.snitch, 0.1))}× Gap`}
+                  </span>
+                </td>
+                <td>
+                  <span className={`lift-pill ${g.lift >= 1 ? "positive-lift" : "neutral-lift"}`}>
+                    {g.lift >= 1 ? "↗" : "↘"} {g.lift.toFixed(2)}×
+                    <span className="text-[9px] font-normal opacity-80">
+                      {g.lift >= 1
+                        ? ` (+${Math.round((g.lift - 1) * 100)}% Stay)`
+                        : ` (-${Math.round((1 - g.lift) * 100)}%)`}
+                    </span>
+                  </span>
                 </td>
                 <td>
                   <EvidenceChip evidence={g.evidence} />
                 </td>
-                <td onClick={(e) => e.stopPropagation()}>
+                <td onClick={(e) => e.stopPropagation()} style={{ textAlign: "right" }}>
                   {g.type === "CATCH_UP" || g.type === "WHITESPACE_TEST" ? (
-                    <BriefLink id={g.id} label="Inspect brief" />
+                    <Button asChild size="sm" className="action-plan-btn">
+                      <Link to="/briefs/$id" params={{ id: g.id }}>
+                        <span>Action Plan</span>
+                        <ArrowRight size={13} />
+                      </Link>
+                    </Button>
                   ) : (
                     <Button
-                      variant="ghost"
                       size="sm"
-                      className="brief-link"
+                      variant="outline"
+                      className="action-plan-outline-btn"
                       onClick={() => setSelected(g)}
                     >
-                      Inspect
-                      <ScanLine />
+                      <span>Action Plan</span>
+                      <ArrowRight size={13} />
                     </Button>
                   )}
                 </td>
@@ -497,17 +515,17 @@ export function CommandCenter() {
               </section>
               <div className="mt-6">
                 {selected.type === "CATCH_UP" || selected.type === "WHITESPACE_TEST" ? (
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full action-plan-btn py-3 text-sm justify-center">
                     <Link to="/briefs/$id" params={{ id: selected.id }}>
-                      Open production brief
-                      <ArrowRight />
+                      Open Action Plan
+                      <ArrowRight size={15} />
                     </Link>
                   </Button>
                 ) : (
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full action-plan-btn py-3 text-sm justify-center">
                     <Link to="/strengths">
                       Open Strength Defense
-                      <ArrowRight />
+                      <ArrowRight size={15} />
                     </Link>
                   </Button>
                 )}
