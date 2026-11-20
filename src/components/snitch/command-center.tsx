@@ -367,6 +367,9 @@ export function CommandCenter() {
                     <span className="opportunity-meta">
                       <span>{g.dimension}</span> · <code>{g.category}</code>
                     </span>
+                    {g.plainEnglish && (
+                      <p className="opportunity-plain-english">{g.plainEnglish}</p>
+                    )}
                   </div>
                 </td>
                 <td>
@@ -465,6 +468,16 @@ export function CommandCenter() {
                   {selected.category} · Rank #{selected.rank}
                 </SheetDescription>
               </SheetHeader>
+              {selected.plainEnglish && (
+                <div className="mt-4 p-3.5 bg-muted/60 rounded-lg border border-border">
+                  <span className="text-[10px] font-semibold tracking-wider uppercase text-muted-foreground block mb-1">
+                    Plain-English Reality
+                  </span>
+                  <p className="text-xs text-foreground leading-relaxed font-normal">
+                    {selected.plainEnglish}
+                  </p>
+                </div>
+              )}
               <div className="brief-badges mt-5">
                 <EvidenceChip evidence={selected.evidence} />
                 <Chip tone={selected.type === "TRIM" ? "danger" : "success"}>

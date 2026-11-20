@@ -1,4 +1,4 @@
-import { gaps as defaultGaps, moats as defaultMoats, drains as defaultDrains, kpis as defaultKpis, sync as defaultSync, type Opportunity } from "./mockData";
+import { gaps as defaultGaps, moats as defaultMoats, drains as defaultDrains, combinations as defaultCombinations, kpis as defaultKpis, sync as defaultSync, type Opportunity } from "./mockData";
 
 export const N8N_WEBHOOK_ENDPOINT = 
   (typeof import.meta !== "undefined" && import.meta.env?.VITE_N8N_API_URL) || 
@@ -71,7 +71,27 @@ export async function fetchLiveDashboardData(): Promise<SnitchDashboardPayload |
     const payload = Array.isArray(data) ? data[0] : data;
 
     if (payload && payload.status === "success") {
-      return payload as SnitchDashboardPayload;
+      const enrichWithPlainEnglish = (list: Opportunity[]) => {
+        if (!list) return list;
+        return list.map((item) => {
+          if (item.plainEnglish) return item;
+          const match =
+            defaultGaps.find((g) => g.id === item.id || g.name === item.name) ||
+            defaultMoats.find((g) => g.id === item.id || g.name === item.name) ||
+            defaultDrains.find((g) => g.id === item.id || g.name === item.name) ||
+            defaultCombinations.find((g) => g.id === item.id || g.name === item.name);
+          return match?.plainEnglish ? { ...item, plainEnglish: match.plainEnglish } : item;
+        });
+      };
+
+      return {
+        ...payload,
+        gaps: enrichWithPlainEnglish(payload.gaps),
+        moats: enrichWithPlainEnglish(payload.moats),
+        drains: enrichWithPlainEnglish(payload.drains),
+        combinations: enrichWithPlainEnglish(payload.combinations),
+        allOpportunities: enrichWithPlainEnglish(payload.allOpportunities),
+      } as SnitchDashboardPayload;
     }
     return null;
   } catch (err) {

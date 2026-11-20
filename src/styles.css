@@ -1202,6 +1202,18 @@
   color: var(--muted-foreground);
   font-family: var(--font-mono);
 }
+.opportunity-plain-english {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: #475569;
+  margin-top: 3px;
+  max-width: 440px;
+  white-space: normal;
+  font-weight: 450;
+}
+:root.dark .opportunity-plain-english {
+  color: #94a3b8;
+}
 .share-cell {
   display: flex;
   flex-direction: column;
