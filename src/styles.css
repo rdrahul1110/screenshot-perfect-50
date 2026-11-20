@@ -1306,9 +1306,13 @@
 }
 .story-image img {
   height: 100%;
+  width: 100%;
+  object-fit: cover;
+  display: block;
+}
+.story-image img.sprite-sheet {
   width: 500%;
   max-width: none;
-  object-fit: cover;
   position: absolute;
   top: 0;
 }

@@ -140,7 +140,11 @@ export function BriefInspector({ id }: { id: string }) {
             {frames.map((f, i) => (
               <article className="story-card" key={f.title}>
                 <div className="story-image">
-                  <img src={editorial.url} alt={f.visual} style={{ left: `-${f.image * 100}%` }} />
+                  {f.imageUrl ? (
+                    <img src={f.imageUrl} alt={f.visual} className="standalone-frame" />
+                  ) : (
+                    <img src={editorial.url} alt={f.visual} className="sprite-sheet" style={{ left: `-${f.image * 100}%` }} />
+                  )}
                   <span className="frame-label">0{i + 1}</span>
                 </div>
                 <div className="story-content">
