@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -16,29 +16,29 @@ import {
 import { Button } from "@/components/ui/button";
 import {
   gaps,
-  storyboard,
-  hooks,
-  remixedHooks,
-  copyOptions,
-  launch,
+  productionBriefs,
   launchSpec,
 } from "@/data/mockData";
 import editorial from "@/assets/weekend-editorial.png.asset.json";
 import { Chip, CopyButton, EvidenceChip, PageHeading, copyText } from "./shared";
-const titles: Record<string, string> = {
-  "1": "Weekend Warrior 3-Piece Bundle Carousel",
-  "2": "The Weekend Drop — Limited-Time Offer",
-  "3": "More Than a Fit — The Snitch Story",
-  "4": "Own Every Weekend — Identity-led Video",
-  "5": "Five Fits, One Weekend — Carousel Test",
-};
+
 export function BriefInspector({ id }: { id: string }) {
   const gap = gaps.find((g) => g.id === id);
+  const currentBrief = productionBriefs[id] || productionBriefs["1"];
+
   const [tab, setTab] = useState("storyboard");
   const [remixed, setRemixed] = useState(false);
-  const [budget, setBudget] = useState(launch.budget);
-  const [days, setDays] = useState(launch.days);
-  const [texts, setTexts] = useState(copyOptions.map((c) => c.text));
+  const [budget, setBudget] = useState(currentBrief.launch.budget);
+  const [days, setDays] = useState(currentBrief.launch.days);
+  const [texts, setTexts] = useState(currentBrief.copyOptions.map((c) => c.text));
+
+  useEffect(() => {
+    setBudget(currentBrief.launch.budget);
+    setDays(currentBrief.launch.days);
+    setTexts(currentBrief.copyOptions.map((c) => c.text));
+    setRemixed(false);
+  }, [id, currentBrief]);
+
   if (!gap)
     return (
       <div className="page-body">
@@ -52,38 +52,13 @@ export function BriefInspector({ id }: { id: string }) {
         </Button>
       </div>
     );
-  const title = titles[id] ?? gap.name;
-  const isBundle = id === "1";
-  const briefHooks = isBundle
-    ? hooks
-    : hooks.map((h, i) => ({
-        ...h,
-        text:
-          i === 0
-            ? `${gap.name}: your next weekend upgrade.`
-            : i === 1
-              ? "Made for the guy who makes every plan his own."
-              : "A fresh perspective. A better fit. Discover Snitch.",
-      }));
-  const adName = isBundle
-    ? launch.name
-    : `SNT_202611_GAP${id.padStart(2, "0")}_${gap.category}_A_v1`;
-  const utm = isBundle
-    ? launch.utm
-    : `utm_source=facebook&utm_medium=paid&utm_campaign=gap${id.padStart(2, "0")}_${gap.category}`;
-  const frames = isBundle
-    ? storyboard
-    : storyboard.map((f, i) => ({
-        ...f,
-        overlay:
-          i === 0
-            ? gap.name
-            : i === 2
-              ? "Discover the Snitch difference"
-              : i === 3
-                ? "Make it your own"
-                : f.overlay,
-      }));
+
+  const title = currentBrief.title;
+  const briefHooks = currentBrief.hooks;
+  const adName = currentBrief.launch.name;
+  const utm = currentBrief.launch.utm;
+  const frames = currentBrief.storyboard;
+
   return (
     <div className="page-body">
       <div className="mb-5">
@@ -121,7 +96,7 @@ export function BriefInspector({ id }: { id: string }) {
         </h2>
         <p>
           Competitors run this{" "}
-          <b>{isBundle ? "18.2" : (gap.competitor / gap.snitch).toFixed(1)}×</b> more than Snitch
+          <b>{(gap.competitor / gap.snitch).toFixed(1)}×</b> more than Snitch
           and keep ads live <b>{gap.lift.toFixed(2)}×</b> longer.
         </p>
       </section>
@@ -149,7 +124,7 @@ export function BriefInspector({ id }: { id: string }) {
           <div className="brief-content-heading">
             <div>
               <h3>The 5-frame creative story</h3>
-              <p>Carousel · 4:5 format · 1080 × 1350 px</p>
+              <p>{currentBrief.format} · 1080 × 1350 px</p>
             </div>
             <CopyButton
               label="Copy full storyboard"
@@ -183,11 +158,10 @@ export function BriefInspector({ id }: { id: string }) {
           <div className="production-note">
             <Clapperboard size={20} />
             <div>
-              <strong>Production direction</strong>
-              <p>{gap.recommendation}</p>
-              <p>
-                Clean light backgrounds. Product-first framing. Keep overlays inside the safe zone
-                and the Snitch wordmark visible on the end slate.
+              <strong>Production direction & Rationale</strong>
+              <p>{currentBrief.rationale}</p>
+              <p className="mt-2 text-xs text-muted-foreground">
+                Target recommendation: {gap.recommendation}
               </p>
             </div>
           </div>
@@ -206,30 +180,21 @@ export function BriefInspector({ id }: { id: string }) {
             </Button>
           </div>
           <div className="hook-list">
-            {briefHooks.map((h, i) => (
-              <article className="hook-row" key={h.type}>
-                <span className="rank-number">0{i + 1}</span>
-                <div>
-                  <small>{h.type}</small>
-                  <p>
-                    {remixed
-                      ? isBundle
-                        ? remixedHooks[i]
-                        : `${gap.name}. Main character energy. Own the weekend.`
-                      : h.text}
-                  </p>
-                </div>
-                <CopyButton
-                  text={
-                    (remixed
-                      ? isBundle
-                        ? remixedHooks[i]
-                        : `${gap.name}. Main character energy. Own the weekend.`
-                      : h.text) ?? h.text
-                  }
-                />
-              </article>
-            ))}
+            {briefHooks.map((h, i) => {
+              const hookText = remixed && currentBrief.remixedHooks[i] 
+                ? currentBrief.remixedHooks[i] 
+                : h.text;
+              return (
+                <article className="hook-row" key={h.type}>
+                  <span className="rank-number">0{i + 1}</span>
+                  <div>
+                    <small>{h.type}</small>
+                    <p>{hookText}</p>
+                  </div>
+                  <CopyButton text={hookText} />
+                </article>
+              );
+            })}
           </div>
           <div className="brief-content-heading">
             <div>
@@ -238,7 +203,7 @@ export function BriefInspector({ id }: { id: string }) {
             </div>
           </div>
           <div className="copy-grid">
-            {copyOptions.map((c, i) => (
+            {currentBrief.copyOptions.map((c, i) => (
               <article className="copy-card" key={c.title}>
                 <h4>
                   Option {i === 0 ? "A" : "B"} · {c.title}
@@ -282,7 +247,7 @@ export function BriefInspector({ id }: { id: string }) {
                   <Users size={16} />
                   Target audience guidance
                 </h3>
-                <p>{launch.audience}</p>
+                <p>{currentBrief.launch.audience}</p>
               </div>
             </div>
             <div>
@@ -319,14 +284,14 @@ export function BriefInspector({ id }: { id: string }) {
                     <CircleAlert size={13} />
                     KILL BENCHMARK
                   </strong>
-                  <p>{launch.kill}</p>
+                  <p>{currentBrief.launch.kill}</p>
                 </div>
                 <div className="rule">
                   <strong className="text-success flex items-center gap-2">
                     <TrendingUp size={13} />
                     SCALE BENCHMARK
                   </strong>
-                  <p>{launch.scale}</p>
+                  <p>{currentBrief.launch.scale}</p>
                 </div>
               </section>
               <Button
